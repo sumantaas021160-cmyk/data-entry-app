@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Entry App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#f2f2f2;
+padding:15px;
+}
+h2{
+text-align:center;
+color:#333;
+}
+input, button{
+width:100%;
+padding:10px;
+margin:6px 0;
+font-size:16px;
+}
+button{
+background:#4CAF50;
+color:white;
+border:none;
+border-radius:5px;
+}
+table{
+width:100%;
+margin-top:15px;
+border-collapse:collapse;
+background:white;
+}
+th, td{
+border:1px solid #999;
+padding:6px;
+text-align:center;
+}
+th{
+background:#ddd;
+}
+.delete{
+background:red;
+color:white;
+border:none;
+padding:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📋 Data Entry App</h2>
+
+<input type="text" id="name" placeholder="Customer Name">
+<input type="number" id="mobile" placeholder="Mobile Number">
+<input type="email" id="email" placeholder="Email ID">
+
+<button onclick="saveData()">Save Data</button>
+<button onclick="downloadCSV()">Download Excel (CSV)</button>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Mobile</th>
+<th>Email</th>
+<th>Delete</th>
+</tr>
+</thead>
+<tbody id="tableData"></tbody>
+</table>
+
+<script>
+let data = JSON.parse(localStorage.getItem("dataEntry")) || [];
+
+function saveData(){
+let name = document.getElementById("name").value;
+let mobile = document.getElementById("mobile").value;
+let email = document.getElementById("email").value;
+
+if(name=="" || mobile==""){
+alert("Name aur Mobile zaroori hai");
+return;
+}
+
+data.push({name, mobile, email});
+localStorage.setItem("dataEntry", JSON.stringify(data));
+showData();
+
+document.getElementById("name").value="";
+document.getElementById("mobile").value="";
+document.getElementById("email").value="";
+}
+
+function showData(){
+let rows="";
+data.forEach((item,index)=>{
+rows+=`<tr>
+<td>${item.name}</td>
+<td>${item.mobile}</td>
+<td>${item.email}</td>
+<td><button class="delete" onclick="deleteData(${index})">X</button></td>
+</tr>`;
+});
+document.getElementById("tableData").innerHTML=rows;
+}
+
+function deleteData(index){
+data.splice(index,1);
+localStorage.setItem("dataEntry", JSON.stringify(data));
+showData();
+}
+
+function downloadCSV(){
+let csv="Name,Mobile,Email\n";
+data.forEach(item=>{
+csv+=`${item.name},${item.mobile},${item.email}\n`;
+});
+let blob=new Blob([csv],{type:"text/csv"});
+let link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="data-entry.csv";
+link.click();
+}
+
+showData();
+</script>
+
+</body>
+</html>
